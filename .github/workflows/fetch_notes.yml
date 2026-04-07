@@ -1,22 +1,31 @@
-name: 自动抓取会议纪要
+name: 智能筛选会议纪要
 
 on:
   schedule:
-    - cron: '0 * * * *'  # 每小时运行
-  workflow_dispatch:      # 允许手动触发
+    - cron: '0 * * * *'
+  workflow_dispatch:
 
 jobs:
   fetch_notes:
     runs-on: ubuntu-latest
+    
     steps:
     - uses: actions/checkout@v4
+    
     - uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-    - run: |
+    
+    - name: 安装依赖
+      run: |
         pip install requests beautifulsoup4 lxml
-        python fetch_simple.py
+    
+    - name: 运行智能筛选脚本
+      env:
+        SERVERCHAN_KEY: ${{ secrets.SERVERCHAN_KEY }}  ← 添加这两行
+      run: python fetch_simple.py
+    
     - uses: actions/upload-artifact@v4
       with:
         name: meeting-notes
-        path: output/fetched_notes/
+        path: output/
